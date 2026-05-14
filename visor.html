@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería DDT en Vivo</title>
+    <style>
+        /* --- Estilos Base y Fondo CSS Premium --- */
+        body {
+            background: radial-gradient(circle at top center, #ff3333 0%, #ec0000 40%, #660000 100%);
+            background-attachment: fixed;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 25px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            margin: 0;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            text-shadow: 2px 4px 10px rgba(0,0,0,0.6);
+            font-size: 2.5rem;
+        }
+
+        /* Controles de Filtro */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        select {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            color: #EC0000;
+            border: 2px solid white;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        select:hover {
+            transform: scale(1.05);
+            background: #ffffff;
+        }
+
+        /* Grilla Mosaico (Masonry CSS) */
+        .gallery {
+            column-count: 4;
+            column-gap: 20px;
+            padding: 10px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1200px) { .gallery { column-count: 3; } }
+        @media (max-width: 800px) { .gallery { column-count: 2; } }
+        @media (max-width: 500px) { .gallery { column-count: 1; } }
+
+        /* Tarjetas de Fotos */
+        .photo-card {
+            break-inside: avoid;
+            margin-bottom: 20px;
+            background: #1a1a1a;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.05);
+        }
+        
+        /* Animación de entrada fluida */
+        .photo-card.new {
+            animation: slideUp 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) backwards;
+        }
+
+        .photo-card:hover {
+            transform: scale(1.03) translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            z-index: 10;
+            border-color: #EC0000;
+        }
+
+        .photo-card img {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+            min-height: 200px; /* Previene saltos visuales mientras carga la imagen */
+        }
+
+        /* Etiqueta Flotante sobre la imagen */
+        .card-info {
+            padding: 20px 15px 15px;
+            text-align: center;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            pointer-events: none;
+        }
+
+        .category-tag {
+            display: inline-block;
+            background: #EC0000;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(60px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        #loading { 
+            text-align: center; 
+            font-size: 1.3rem;
+            font-weight: bold;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.6);
+            margin-top: 60px; 
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0.4; transform: scale(0.98); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🔴 GALERÍA EN VIVO DDT 🔴</h1>
+        <div class="controls">
+            <select id="filtro" onchange="renderPhotos()">
+                <option value="todos">Todos los momentos</option>
+                <option value="1. mi selfie">1. Mi selfie</option>
+                <option value="2. Foto con mi líder de area">2. Foto con mi líder de área</option>
+                <option value="3. Mi experiencia DDT">3. Mi experiencia DDT</option>
+            </select>
+        </div>
+    </header>
+
+    <div id="loading">📡 Recibiendo fotos en tiempo real...</div>
+    <div id="gallery" class="gallery"></div>
+
+    <!-- SDK Unificado a la versión 10.8.0 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Mismas credenciales del index
+        const firebaseConfig = {
+            apiKey: "AIzaSyBP5D1AtaIcklOFJiKnEXKilgsz5-363RE",
+            authDomain: "veltis-data1.firebaseapp.com",
+            projectId: "veltis-data1",
+            storageBucket: "veltis-data1.firebasestorage.app",
+            messagingSenderId: "607614671540",
+            appId: "1:607614671540:web:8118954f681910ecf995e1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        let allPhotos = [];
+        const gallery = document.getElementById('gallery');
+        const loader = document.getElementById('loading');
+
+        // ESCUCHA EN TIEMPO REAL LA COLECCIÓN "DDT santander"
+        // Límite de 50 fotos para mantener el visor fluido y no saturar memoria en el evento
+        const q = query(collection(db, "DDT santander"), orderBy("fecha", "desc"), limit(50));
+
+        onSnapshot(q, (snapshot) => {
+            allPhotos = [];
+            snapshot.forEach((doc) => {
+                allPhotos.push(doc.data());
+            });
+            
+            if (allPhotos.length > 0) loader.style.display = 'none';
+            renderPhotos();
+        });
+
+        // Función global de renderizado
+        window.renderPhotos = () => {
+            const filtro = document.getElementById('filtro').value;
+            gallery.innerHTML = ''; // Limpiar grilla
+
+            allPhotos.forEach(foto => {
+                // Filtro lógico
+                if (filtro !== 'todos' && foto.categoria !== filtro) return;
+
+                // Crear elemento visual
+                const div = document.createElement('div');
+                div.className = 'photo-card new';
+                
+                div.innerHTML = `
+                    <img src="${foto.url_foto}" alt="Experiencia DDT" loading="lazy">
+                    <div class="card-info">
+                        <span class="category-tag">${foto.categoria}</span>
+                    </div>
+                `;
+                
+                gallery.appendChild(div);
+            });
+        };
+    </script>
+</body>
+</html>

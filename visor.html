@@ -32,26 +32,22 @@
             color: #fff;
         }
 
-        /* --- CONTENEDOR DEL CARRUSEL --- */
         .carousel-container {
             flex-grow: 1;
             display: flex;
             align-items: center;
             overflow: hidden;
             position: relative;
-            /* Sombra superior e inferior para dar profundidad */
             box-shadow: inset 0 50px 50px -50px #000, inset 0 -50px 50px -50px #000;
         }
 
-        /* La pista que se mueve constantemente */
         .carousel-track {
             display: flex;
             gap: 60px;
-            padding: 0 50vw; /* Empieza y termina fuera de la pantalla */
+            padding: 0 50vw; 
             animation: scroll-carousel 40s linear infinite;
         }
 
-        /* Pausar animación si pasas el mouse (opcional para el animador) */
         .carousel-track:hover {
             animation-play-state: paused;
         }
@@ -61,18 +57,15 @@
             100% { transform: translateX(-100%); }
         }
 
-        /* --- TARJETAS CON REFLEJO --- */
         .photo-card {
-            flex: 0 0 400px; /* Ancho fijo grande para las pantallas */
-            height: 533px; /* Proporción 3:4 */
+            flex: 0 0 400px; 
+            height: 533px; 
             background: #111;
             border: 5px solid #fff;
             border-radius: 15px;
             position: relative;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            
-            /* LA MAGIA DEL REFLEJO (Soporte en navegadores WebKit/Chrome) */
             -webkit-box-reflect: below 15px linear-gradient(transparent, transparent, rgba(0,0,0,0.4));
         }
 
@@ -89,7 +82,6 @@
             border-radius: 8px;
         }
 
-        /* Etiqueta flotante estilo neón */
         .category-tag {
             position: absolute;
             bottom: -20px;
@@ -107,7 +99,6 @@
             z-index: 10;
         }
 
-        /* Nueva foto entrando al DOM */
         .photo-card.new-entry {
             animation: pop-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
@@ -126,7 +117,7 @@
 
     <div class="carousel-container">
         <div id="carousel-track" class="carousel-track">
-            <!-- Las fotos se inyectan aquí -->
+            <!-- JS -->
         </div>
     </div>
 
@@ -167,7 +158,6 @@
                             <div class="category-tag">${foto.categoria}</div>
                         `;
                         
-                        // Añadimos al inicio del track
                         track.insertBefore(div, track.firstChild);
                     }
                 }

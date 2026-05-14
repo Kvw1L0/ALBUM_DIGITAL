@@ -1,18 +1,21 @@
 /* =========================================
    1. ESTILOS BASE Y FONDO ANIMADO
    ========================================= */
-body {
+html, body {
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
   text-align: center;
   
-  /* Fondo radial dinámico (Respirable) */
+  /* Fondo radial dinámico (Respirable y Fijo) */
   background: linear-gradient(-45deg, #ff0000, #a80000, #220000, #ec0000);
   background-size: 400% 400%;
   animation: bg-movement 15s ease infinite;
   color: white;
-  overflow: hidden;
+  
+  min-height: 100vh;
+  background-attachment: fixed;
+  overflow-x: hidden;
 }
 
 @keyframes bg-movement {
@@ -29,12 +32,12 @@ h1 {
   letter-spacing: 2px;
 }
 
-/* LA CLASE CRÍTICA QUE FALTABA (Oculta las pantallas no activas) */
+/* CLASE CRÍTICA PARA OCULTAR ELEMENTOS */
 .hidden {
   display: none !important;
 }
 
-/* Contenedor scrolleable del álbum */
+/* Contenedor scrolleable transparente */
 .container {
   position: absolute;
   bottom: 0;
@@ -44,6 +47,7 @@ h1 {
   overflow-y: auto; 
   padding: 20px 15px;
   -webkit-overflow-scrolling: touch; 
+  background: transparent !important;
 }
 
 .text-center {
@@ -51,7 +55,7 @@ h1 {
 }
 
 /* =========================================
-   2. LANDING PAGE (Portal de Entrada)
+   2. LANDING PAGE
    ========================================= */
 .landing-page {
   display: flex;
@@ -118,13 +122,11 @@ h1 {
 /* =========================================
    3. GRILLA Y LÁMINAS (Rotadas y Sinuosas)
    ========================================= */
-
-/* Grilla configurada para 2 arriba y 1 centrado abajo */
 .grid-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 25px; /* Espacio para las rotaciones */
+  gap: 25px; 
   max-width: 600px; 
   margin: 0 auto;
 }
@@ -134,7 +136,6 @@ h1 {
   max-width: 220px; 
 }
 
-/* Rotaciones alternadas estilo álbum real */
 .card {
   background: transparent;
   width: 100%;
@@ -143,30 +144,23 @@ h1 {
 .card:nth-child(1) { transform: rotate(-4deg); }
 .card:nth-child(2) { transform: rotate(5deg); }
 .card:nth-child(3) { transform: rotate(-2deg) translateY(10px); }
-.card:nth-child(4) { transform: rotate(6deg) scale(1.05); } /* Lámina secreta */
+.card:nth-child(4) { transform: rotate(6deg) scale(1.05); } 
 
 .card:active { transform: scale(0.92); }
 
-/* Marco de la Foto (Estilo Sinuoso/Orgánico) */
 .inner-frame {
   background: #050505; 
-  border: 4px solid #fff; /* Borde blanco tipo lámina/polaroid */
-  
-  /* Borde sinuoso: radios irregulares */
+  border: 4px solid #fff; 
   border-radius: 8px 25px 12px 22px / 20px 10px 25px 15px; 
-  
   width: 100%;
-  padding-top: 133%; /* Proporción 3:4 */
+  padding-top: 133%; 
   position: relative;
   overflow: hidden;
-  box-shadow: 
-    3px 5px 15px rgba(0, 0, 0, 0.6),   
-    inset 0 0 10px rgba(0, 0, 0, 0.8); 
+  box-shadow: 3px 5px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.8); 
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
-/* Textura Halftone (puntos) de fondo para cuadros vacíos */
 .inner-frame::before {
   content: "";
   position: absolute;
@@ -176,7 +170,6 @@ h1 {
   z-index: 0;
 }
 
-/* Texto central "➕ FOTO" */
 .inner-frame::after {
   content: "➕ FOTO";
   position: absolute;
@@ -194,13 +187,11 @@ h1 {
   z-index: 1;
 }
 
-/* Ocultar textura y texto si ya hay foto */
 .inner-frame.has-photo::after,
 .inner-frame.has-photo::before {
   display: none;
 }
 
-/* Imagen tomada */
 .inner-frame img {
   width: 100%;
   height: 100%;
@@ -212,7 +203,18 @@ h1 {
   filter: contrast(1.1) saturate(1.1); 
 }
 
-/* Etiqueta inferior de la tarjeta */
+/* Efecto WOW: Latido Verde para Foto Tomada */
+@keyframes latido-verde {
+  0% { box-shadow: 0 0 10px #28a745; }
+  50% { box-shadow: 0 0 25px #28a745, inset 0 0 10px #28a745; }
+  100% { box-shadow: 0 0 10px #28a745; }
+}
+
+.inner-frame.has-photo {
+  border-color: #28a745 !important;
+  animation: latido-verde 2s infinite ease-in-out;
+}
+
 .card p {
   font-size: 0.85em;
   margin-top: 12px;
@@ -298,7 +300,6 @@ h1 {
   flex-wrap: wrap;
 }
 
-/* --- POP-UP DE ÉXITO FINAL --- */
 .success-content {
   background: linear-gradient(145deg, #111, #220000);
   border: 2px solid #EC0000;
@@ -377,7 +378,6 @@ h1 {
   100% { transform: scale(1); opacity: 1; }
 }
 
-/* --- Efecto Sobrecarga (Glitch por Agitación del Teléfono) --- */
 body.glitch-active {
   animation: bg-glitch-shake 0.15s infinite;
 }

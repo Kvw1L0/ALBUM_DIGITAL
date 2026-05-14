@@ -120,7 +120,7 @@ h1 {
 }
 
 /* =========================================
-   3. GRILLA Y LÁMINAS (Rotadas y Sinuosas)
+   3. GRILLA Y LÁMINAS (El toque del Álbum Real)
    ========================================= */
 .grid-row {
   display: flex;
@@ -129,6 +129,9 @@ h1 {
   gap: 25px; 
   max-width: 600px; 
   margin: 0 auto;
+  
+  /* EL SECRETO: Toda la grilla levemente en diagonal */
+  transform: rotate(-2deg); 
 }
 
 .grid-col {
@@ -141,16 +144,19 @@ h1 {
   width: 100%;
   transition: transform 0.2s;
 }
-.card:nth-child(1) { transform: rotate(-4deg); }
-.card:nth-child(2) { transform: rotate(5deg); }
-.card:nth-child(3) { transform: rotate(-2deg) translateY(10px); }
-.card:nth-child(4) { transform: rotate(6deg) scale(1.05); } 
+
+/* El desorden individual de cada lámina pegada a mano */
+.card:nth-child(1) { transform: rotate(-3deg); }
+.card:nth-child(2) { transform: rotate(4deg) translateY(5px); }
+.card:nth-child(3) { transform: rotate(-5deg) translateY(10px); }
+.card:nth-child(4) { transform: rotate(6deg) scale(1.05); } /* Lámina secreta */
 
 .card:active { transform: scale(0.92); }
 
 .inner-frame {
   background: #050505; 
   border: 4px solid #fff; 
+  /* Borde orgánico y sinuoso */
   border-radius: 8px 25px 12px 22px / 20px 10px 25px 15px; 
   width: 100%;
   padding-top: 133%; 

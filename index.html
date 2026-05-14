@@ -2,30 +2,38 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Misiones Fotográficas DDT</title>
+  
+  <!-- Enlace a tu CSS con estilo Neon/Jungle -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Landing Page Inicial -->
+  <!-- ==========================================
+       1. LANDING PAGE (Pantalla de Inicio)
+       ========================================== -->
   <div id="landing" class="landing-page" onclick="iniciarAlbum()">
     <div class="landing-content">
         <h1 class="display-4">Misiones DDT</h1>
-        <p class="lead">Toca la pantalla y completa tu álbum de experiencia.</p>
+        <p class="lead">Completa tu álbum de experiencia.</p>
         <div class="album-icon-container">
-            <span class="album-icon-text">📸 Iniciar</span>
+            📸 Iniciar
         </div>
+        <p style="margin-top: 20px; font-size: 0.8em; color: #888;">
+          Agita el teléfono dentro del álbum para una sorpresa.
+        </p>
     </div>
   </div>
 
-  <!-- Contenido Principal -->
+  <!-- ==========================================
+       2. CONTENIDO PRINCIPAL (El Álbum)
+       ========================================== -->
   <div id="contenido" class="hidden container">
     <h1 class="text-center">Tu Álbum DDT</h1>
     
-    <div id="laminas" class="grid-row">
-      <!-- Las 3 tarjetas se generan aquí con JS -->
-    </div>
+    <!-- Aquí el JS inyectará las láminas fotográficas -->
+    <div id="laminas" class="grid-row"></div>
     
     <div class="actions">
       <button id="btn-share" class="btn btn-primary" onclick="subirFotosAlServidor()">
@@ -34,7 +42,9 @@
     </div>
   </div>
 
-  <!-- Modal de Cámara -->
+  <!-- ==========================================
+       3. MODAL DE CÁMARA (Captura en vivo)
+       ========================================== -->
   <div id="camera-modal" class="modal hidden">
     <div class="modal-content">
       <h5 id="titulo-lamina" class="modal-title"></h5>
@@ -57,13 +67,27 @@
     </div>
   </div>
 
-  <!-- CONFIGURACIÓN DE FIREBASE 10.8.0 -->
+  <!-- ==========================================
+       4. MODAL DE ÉXITO FINAL (Cierre Épico)
+       ========================================== -->
+  <div id="success-modal" class="modal hidden">
+    <div class="modal-content success-content">
+      <div class="success-icon">🏆</div>
+      <h1 class="modal-title" style="font-size: 1.8rem; text-shadow: 0 0 10px #EC0000;">¡MISIONES COMPLETADAS!</h1>
+      <p style="color: #ccc; margin-bottom: 25px;">Tus fotos ya están en la pantalla principal del evento.</p>
+      <button class="btn btn-primary" onclick="location.reload()">Empezar Nuevo Álbum</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       5. CONFIGURACIÓN DE FIREBASE (DDT Santander)
+       ========================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
     import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    // Reemplaza con tus credenciales
+    // Tus credenciales originales
     const firebaseConfig = {
       apiKey: "AIzaSyBP5D1AtaIcklOFJiKnEXKilgsz5-363RE",
       authDomain: "veltis-data1.firebaseapp.com",
@@ -73,8 +97,10 @@
       appId: "1:607614671540:web:8118954f681910ecf995e1"
     };
 
+    // Inicializar app
     const app = initializeApp(firebaseConfig);
     
+    // Exportar variables al objeto window para que script.js las pueda usar
     window.db = getFirestore(app);
     window.storage = getStorage(app);
     window.dbCollection = collection;
@@ -84,18 +110,13 @@
     window.sUpload = uploadString;
     window.sGetUrl = getDownloadURL;
     
-    console.log("🔥 Firebase conectado en modo DDT");
+    console.log("🔥 Firebase 10.8.0 conectado. Listo para recibir fotos en 'DDT santander'.");
   </script>
 
+  <!-- ==========================================
+       6. TU SCRIPT PRINCIPAL (Lógica, Audio y Sensores)
+       ========================================== -->
   <script src="script.js" defer></script>
-  <!-- Modal de Éxito Final -->
-  <div id="success-modal" class="modal hidden">
-    <div class="modal-content success-content">
-      <div class="success-icon">🏆</div>
-      <h1 class="modal-title" style="font-size: 1.8rem; text-shadow: 0 0 10px #EC0000;">¡MISIONES COMPLETADAS!</h1>
-      <p style="color: #ccc; margin-bottom: 25px;">Tus fotos ya están en la pantalla principal del evento.</p>
-      <button class="btn btn-primary" onclick="location.reload()">Empezar Nuevo Álbum</button>
-    </div>
-  </div>
+
 </body>
 </html>

@@ -8,51 +8,29 @@
 </head>
 <body>
 
-  <!-- ==========================================
-       1. LANDING PAGE (Pantalla de Inicio)
-       ========================================== -->
+  <div id="camera-flash" class="flash-overlay hidden"></div>
+
   <div id="landing" class="landing-page" onclick="iniciarAlbum()">
-    <div class="landing-content">
-        <h1 class="display-4">Misiones DDT</h1>
-        <p class="lead">Completa tu álbum de experiencia.</p>
-        <div class="album-icon-container">
-            📸 Iniciar
-        </div>
-        <p style="margin-top: 20px; font-size: 0.8em; color: #888;">
-          Agita el teléfono dentro del álbum para una sorpresa.
-        </p>
+    <div class="album-icon-container glass-effect">
+        📸 COMENZAR
     </div>
   </div>
 
-  <!-- ==========================================
-       2. CONTENIDO PRINCIPAL (El Álbum)
-       ========================================== -->
   <div id="contenido" class="hidden container">
-    <h1 class="text-center" style="cursor: pointer;">Tu Álbum DDT</h1>
-    
-    <!-- Aquí el JS inyectará las láminas fotográficas -->
     <div id="laminas" class="grid-row"></div>
     
     <div class="actions">
-      <button id="btn-share" class="btn btn-primary" onclick="subirFotosAlServidor()">
+      <button id="btn-share" class="btn btn-primary glass-effect" onclick="subirFotosAlServidor()">
         ☁️ Enviar mis fotos 
       </button>
     </div>
   </div>
 
-  <!-- ==========================================
-       3. MODAL DE CÁMARA (Captura en vivo)
-       ========================================== -->
   <div id="camera-modal" class="modal hidden">
-    <div class="modal-content">
+    <div class="modal-content glass-modal">
       <h5 id="titulo-lamina" class="modal-title"></h5>
-      
       <video id="video" autoplay playsinline></video>
-      
-      <button id="switch-camera" class="btn btn-secondary btn-sm" onclick="cambiarCamara()">
-        🔄 Cambiar Cámara
-      </button>
-      
+      <button id="switch-camera" class="btn btn-secondary btn-sm" onclick="cambiarCamara()">🔄 Cambiar Cámara</button>
       <div class="modal-actions">
         <button class="btn btn-primary" onclick="capturarFoto()">📷 Capturar</button>
         <label class="btn btn-outline">
@@ -60,16 +38,12 @@
           <input type="file" accept="image/*" onchange="subirDesdeGaleria(event)" class="hidden" />
         </label>
       </div>
-
       <button class="modal-close" onclick="cerrarModal()">&times;</button>
     </div>
   </div>
 
-  <!-- ==========================================
-       4. MODAL DE ÉXITO FINAL (Cierre Épico)
-       ========================================== -->
   <div id="success-modal" class="modal hidden">
-    <div class="modal-content success-content">
+    <div class="modal-content success-content glass-modal">
       <div class="success-icon">🏆</div>
       <h1 class="modal-title" style="font-size: 1.8rem; text-shadow: 0 0 10px #EC0000;">¡MISIONES COMPLETADAS!</h1>
       <p style="color: #ccc; margin-bottom: 25px;">Tus fotos ya están en la pantalla principal del evento.</p>
@@ -77,9 +51,6 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       5. CONFIGURACIÓN DE FIREBASE (DDT Santander)
-       ========================================== -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -95,7 +66,6 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    
     window.db = getFirestore(app);
     window.storage = getStorage(app);
     window.dbCollection = collection;
@@ -105,11 +75,6 @@
     window.sUpload = uploadString;
     window.sGetUrl = getDownloadURL;
   </script>
-
-  <!-- ==========================================
-       6. TU SCRIPT PRINCIPAL
-       ========================================== -->
   <script src="script.js" defer></script>
-
 </body>
 </html>

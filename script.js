@@ -1,5 +1,5 @@
 // ==========================================
-// 1. CONSTANTES Y ESTADO GLOBAL (BLINDADO)
+// 1. CONSTANTES Y ESTADO GLOBAL
 // ==========================================
 const laminas = [
   "1. mi selfie",
@@ -12,7 +12,6 @@ let currentCard = null;
 let stream = null;
 let currentFacingMode = 'user'; 
 
-// PARCHE ANTI-CRASH: Manejo seguro de localStorage para modo incógnito/webviews
 let userId = 'ddt_' + Math.random().toString(36).substr(2, 9);
 try {
     let storedId = localStorage.getItem('ddt_user_id');
@@ -22,7 +21,7 @@ try {
         localStorage.setItem('ddt_user_id', userId);
     }
 } catch(e) {
-    console.warn("Modo incógnito o restrictivo detectado. Usando ID temporal.");
+    console.warn("Modo incógnito o restrictivo detectado.");
 }
 
 const globalCanvas = document.createElement('canvas');
@@ -38,7 +37,7 @@ function initAudio() {
     try {
         if (!audioCtx && AudioContext) audioCtx = new AudioContext();
         if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-    } catch(e) { console.warn("Audio no soportado o bloqueado"); }
+    } catch(e) {}
 }
 
 function playSound(type) {
@@ -103,7 +102,6 @@ function handleMotion(e) {
     lastX = acc.x; lastY = acc.y; lastZ = acc.z;
 }
 
-// Cheat Code: 3 toques rápidos al FONDO
 let tapCount = 0;
 document.addEventListener('DOMContentLoaded', () => {
     const mainContainer = document.querySelector('.container');
@@ -170,7 +168,6 @@ function iniciarAlbum() {
     if(landing) landing.classList.add('hidden'); 
     if(contenido) contenido.classList.remove('hidden');
 }
-// Vinculamos la función globalmente para que el HTML la pueda ver
 window.iniciarAlbum = iniciarAlbum;
 
 function generarAlbum() {
@@ -179,12 +176,13 @@ function generarAlbum() {
     laminas.forEach(titulo => { crearLaminaIndividual(titulo); });
 }
 
+// CORRECCIÓN CRÍTICA JS: Quitamos el "shrink-in" del cardDiv para que no anule la rotación del CSS
 function crearLaminaIndividual(titulo) {
     const colDiv = document.createElement('div');
     colDiv.className = 'grid-col';
     
     const cardDiv = document.createElement('div');
-    cardDiv.className = 'card shrink-in'; 
+    cardDiv.className = 'card'; // ¡AQUÍ ESTABA EL BUG! Lo limpiamos.
     
     const innerFrame = document.createElement('div');
     innerFrame.className = 'inner-frame';
@@ -279,7 +277,7 @@ window.cerrarModal = cerrarModal;
 
 
 // ==========================================
-// 6. CAPTURA Y PROCESAMIENTO (Con Flash)
+// 6. CAPTURA Y PROCESAMIENTO
 // ==========================================
 function insertarImagen(dataUrl) {
   if (!currentCard) return;
@@ -288,6 +286,7 @@ function insertarImagen(dataUrl) {
   
   const img = document.createElement('img');
   img.src = dataUrl;
+  img.className = 'shrink-in'; // CORRECCIÓN CRÍTICA: La animación va solo en la foto
   currentCard.appendChild(img);
 }
 

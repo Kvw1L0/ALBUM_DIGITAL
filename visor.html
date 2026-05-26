@@ -166,6 +166,9 @@
         let fotosEnPantalla = [];   
         
         let configActual = { vista: "carrusel", filtro: "todos", lastSorteoTimestamp: 0, sorteoActivo: false };
+        
+        // 🔥 MAGIA AQUÍ: Variable para asegurar el Auto-Arranque de la pantalla
+        let esPrimeraCarga = true;
 
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTick(freq = 600, duration = 0.05) {
@@ -197,26 +200,18 @@
             } catch(e){}
         }
 
-        // ==========================================
-        // 🔥 FILTRO INTELIGENTE (A PRUEBA DE BALAS) 🔥
-        // ==========================================
         function fotoPasaFiltro(foto) {
             if (!configActual.filtro || configActual.filtro === "todos") return true;
-            
             const filtroTexto = configActual.filtro.trim();
             const categoriaFoto = (foto.categoria || "").trim();
             
-            // TRUCO INFALIBLE: Comparamos solo el primer número (1, 2, 3 o 4)
             const numeroFiltro = filtroTexto.charAt(0);
             const numeroCategoria = categoriaFoto.charAt(0);
             
             if (numeroFiltro >= '1' && numeroFiltro <= '4' && numeroFiltro === numeroCategoria) {
                 return true;
             }
-            
-            // Respaldo secundario por texto
             return categoriaFoto.toLowerCase().includes(filtroTexto.toLowerCase());
-        }
         }
 
         // --- LISTENER DEL ADMIN ---
@@ -224,15 +219,22 @@
             if (!snapshot.exists()) return;
             const data = snapshot.data();
             
+            let necesitaReRender = false;
+
             if(data.filtro !== configActual.filtro) {
                 configActual.filtro = data.filtro;
-                ejecutarFiltroRemoto();
+                necesitaReRender = true;
             }
 
             if(data.vista !== configActual.vista) {
                 configActual.vista = data.vista;
                 document.getElementById('carrusel-view').classList.toggle('hidden', data.vista !== 'carrusel');
                 document.getElementById('mosaico-view').classList.toggle('hidden', data.vista !== 'mosaico');
+                necesitaReRender = true;
+            }
+
+            // Solo renderizamos si no estamos en la fase de carga inicial (para no entorpecer el auto-arranque)
+            if (necesitaReRender && !esPrimeraCarga) {
                 ejecutarFiltroRemoto();
             }
 
@@ -256,22 +258,33 @@
                     const foto = change.doc.data();
                     if (!baseDeDatosMaster.some(f => f.url_foto === foto.url_foto)) {
                         baseDeDatosMaster.push(foto); 
-                        colaDeEspera.push(foto);     
+                        
+                        // Si ya terminó de arrancar, manda la foto al peaje (buffer) para que se anime suave
+                        if (!esPrimeraCarga) {
+                            colaDeEspera.push(foto);     
+                        }
                     }
                 }
             });
+
+            // 🔥 AUTO-ARRANQUE CRÍTICO: La primera vez que lee la base, inyecta todo de golpe para no dejar la pantalla vacía
+            if (esPrimeraCarga) {
+                esPrimeraCarga = false;
+                ejecutarFiltroRemoto();
+            }
         });
 
         // --- PEAJE INTELIGENTE OPTIMIZADO ---
         setInterval(() => {
             if (colaDeEspera.length > 0 && configActual.sorteoActivo === false && configActual.vista === 'carrusel') {
-                // Buscamos el índice de la primera foto en la cola que cumpla el filtro actual
                 const indexValido = colaDeEspera.findIndex(fotoPasaFiltro);
                 
                 if (indexValido !== -1) {
-                    // Extraemos solo ese elemento específico de la cola sin alterar los demás
                     const fotoParaInyectar = colaDeEspera.splice(indexValido, 1)[0];
                     inyectarFotoAlDOM(fotoParaInyectar);
+                } else {
+                    // 🔥 LIBERADOR DE TRÁFICO: Si la foto no cumple el filtro, la sacamos de la fila para no atascar las demás
+                    colaDeEspera.shift();
                 }
             }
         }, 2000); 
@@ -322,62 +335,4 @@
                 return;
             }
 
-            const sorteoOverlay = document.getElementById('sorteo-view');
-            const ruletaImg = document.getElementById('ruleta-img');
-            const sorteoTxt = document.getElementById('sorteo-txt');
-            
-            sorteoTxt.textContent = "🎰 SELECCIONANDO GANADOR 🎰";
-            sorteoOverlay.classList.remove('hidden');
-
-            let velocidad = 50; 
-            let vueltas = 0;
-
-            function girar() {
-                if (configActual.sorteoActivo === false) return; 
-
-                const indiceActual = Math.floor(Math.random() * fotosParaSorteo.length);
-                ruletaImg.src = fotosParaSorteo[indiceActual].url_foto;
-                playTick(600 + (vueltas * 5), 0.04); 
-
-                vueltas++;
-
-                if (vueltas < 40) {
-                    setTimeout(girar, velocidad);
-                } else if (vueltas < 55) {
-                    velocidad += 35;
-                    setTimeout(girar, velocidad);
-                } else {
-                    setTimeout(() => {
-                        if (configActual.sorteoActivo === false) return;
-                        sorteoTxt.textContent = "🏆 ¡GANADOR ENCONTRADO! 🏆";
-                        playWinnerSound();
-                        dispararMegaConfeti();
-                    }, 200);
-                }
-            }
-            girar();
-        }
-
-        function dispararMegaConfeti() {
-            for (let i = 0; i < 120; i++) {
-                const confetti = document.createElement('div');
-                confetti.style.position = 'fixed';
-                confetti.style.width = '15px'; confetti.style.height = '15px';
-                confetti.style.backgroundColor = ['#EC0000', '#FFF', '#F0B90B', '#28a745'][Math.floor(Math.random() * 4)];
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.top = '-20px';
-                confetti.style.zIndex = '99999';
-                confetti.style.borderRadius = (Math.random() > 0.5) ? '50%' : '3px';
-                confetti.style.transition = 'transform 4s ease-in, top 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                document.body.appendChild(confetti);
-
-                setTimeout(() => {
-                    confetti.style.top = '120vh';
-                    confetti.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 150 - 75}px)`;
-                }, 50);
-                setTimeout(() => { confetti.remove(); }, 4500);
-            }
-        }
-    </script>
-</body>
-</html>
+            const sorteo

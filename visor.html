@@ -22,7 +22,7 @@
         .carousel-container {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            top: 220px; /* Bajado un poco para alejar de las letras principales */
+            top: 220px; 
             display: flex;
             align-items: center;
             overflow: hidden;
@@ -32,14 +32,13 @@
             gap: 50px;
             padding: 0 50vw; 
             will-change: transform;
-            animation: scroll-carrusel 45s linear infinite; /* Un poco más lento para mejor lectura */
+            animation: scroll-carrusel 45s linear infinite; 
         }
         @keyframes scroll-carrusel {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
 
-        /* Diseño de Tarjetas en Carrusel */
         .photo-card {
             flex: 0 0 350px; 
             height: 466px; 
@@ -55,11 +54,11 @@
             border-radius: 10px;
         }
 
-        /* --- CONTENEDOR 2: MODO MOSAICO MASIVO (El 40% más abajo) --- */
+        /* --- CONTENEDOR 2: MODO MOSAICO MASIVO --- */
         .mosaic-container {
             position: absolute;
             bottom: 0; left: 0; right: 0;
-            top: 260px; /* CORRECCIÓN: Bajado drásticamente para no chocar con "TU ÁLBUM DDT" */
+            top: 260px; 
             overflow-y: auto;
             padding: 30px;
             display: grid;
@@ -84,7 +83,6 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* Etiquetas comunes de categoría */
         .category-tag {
             position: absolute;
             bottom: -15px; left: 50%;
@@ -169,7 +167,6 @@
         
         let configActual = { vista: "carrusel", filtro: "todos", lastSorteoTimestamp: 0, sorteoActivo: false };
 
-        // Audio 1: El Tic de la ruleta (se mantiene)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         function playTick(freq = 600, duration = 0.05) {
             try {
@@ -183,7 +180,6 @@
             } catch(e){}
         }
 
-        // Audio 2: Nuevo sonido de Ganador (Acorde mayor armonioso en lugar de pitidos molestos)
         function playWinnerSound() {
             try {
                 [440, 554.37, 659.25].forEach((freq, i) => { 
@@ -199,6 +195,20 @@
                     osc.stop(audioCtx.currentTime + 3);
                 });
             } catch(e){}
+        }
+
+        // ==========================================
+        // 🔥 NUEVO HELPER DE FILTRADO INTELIGENTE 🔥
+        // ==========================================
+        function fotoPasaFiltro(foto) {
+            if (!configActual.filtro || configActual.filtro === "todos") return true;
+            
+            // Convertimos ambos a minúsculas y quitamos espacios para evitar errores humanos
+            const filtroNorm = configActual.filtro.trim().toLowerCase();
+            const catNorm = (foto.categoria || "").trim().toLowerCase();
+            
+            // Busca coincidencias parciales (ej: "mi selfie" coincidirá con "1. Mi Selfie")
+            return catNorm.includes(filtroNorm) || filtroNorm.includes(catNorm);
         }
 
         // --- LISTENER DEL ADMIN ---
@@ -218,13 +228,11 @@
                 ejecutarFiltroRemoto();
             }
 
-            // Ocultar la ruleta si el Admin pulsa el botón de cerrar
             if(data.sorteoActivo === false && configActual.sorteoActivo === true) {
                 configActual.sorteoActivo = false;
                 document.getElementById('sorteo-view').classList.add('hidden');
             }
 
-            // Lanzar ruleta
             if(data.triggerSorteo && data.triggerSorteo !== configActual.lastSorteoTimestamp) {
                 configActual.lastSorteoTimestamp = data.triggerSorteo;
                 configActual.sorteoActivo = true;
@@ -250,7 +258,10 @@
         setInterval(() => {
             if (colaDeEspera.length > 0 && configActual.sorteoActivo === false && configActual.vista === 'carrusel') {
                 const fotoParaInyectar = colaDeEspera.shift(); 
-                if (configActual.filtro !== "todos" && fotoParaInyectar.categoria !== configActual.filtro) return;
+                
+                // Aplicamos el filtro inteligente
+                if (!fotoPasaFiltro(fotoParaInyectar)) return;
+                
                 inyectarFotoAlDOM(fotoParaInyectar);
             }
         }, 2000); 
@@ -264,11 +275,9 @@
                 <div class="category-tag">${foto.categoria}</div>
             `;
             
-            // CORRECCIÓN: appendChild inserta la foto a la DERECHA de la fila, respetando el flujo natural.
             track.appendChild(div);
             fotosEnPantalla.push(div);
 
-            // Aumentamos el límite de DOM para permitir un flujo infinito natural más prolongado
             if (fotosEnPantalla.length > 40) {
                 const fotoVieja = fotosEnPantalla.shift();
                 fotoVieja.remove();
@@ -280,7 +289,8 @@
             const mosaicoGrid = document.getElementById('mosaico-view');
             track.innerHTML = ''; mosaicoGrid.innerHTML = ''; fotosEnPantalla = [];
 
-            const fotosFiltradas = baseDeDatosMaster.filter(f => configActual.filtro === "todos" || f.categoria === configActual.filtro);
+            // Usamos el filtro inteligente para reconstruir la vista
+            const fotosFiltradas = baseDeDatosMaster.filter(fotoPasaFiltro);
 
             if (configActual.vista === 'carrusel') {
                 fotosFiltradas.slice(0, 15).reverse().forEach(f => inyectarFotoAlDOM(f));
@@ -296,10 +306,11 @@
 
         // --- MOTOR DE LA RULETA ---
         function iniciarMecanicaSorteo() {
-            const fotosParaSorteo = baseDeDatosMaster.filter(f => configActual.filtro === "todos" || f.categoria === configActual.filtro);
+            // Usamos el filtro inteligente para elegir a los participantes
+            const fotosParaSorteo = baseDeDatosMaster.filter(fotoPasaFiltro);
             
             if (fotosParaSorteo.length === 0) {
-                alert("No hay fotos registradas para realizar el sorteo.");
+                alert("No hay fotos registradas bajo este filtro para realizar el sorteo.");
                 return;
             }
 
@@ -314,7 +325,6 @@
             let vueltas = 0;
 
             function girar() {
-                // Si el admin apretó cerrar mientras giraba, abortamos la animación
                 if (configActual.sorteoActivo === false) return; 
 
                 const indiceActual = Math.floor(Math.random() * fotosParaSorteo.length);
@@ -331,38 +341,4 @@
                 } else {
                     setTimeout(() => {
                         if (configActual.sorteoActivo === false) return;
-                        sorteoTxt.textContent = "🏆 ¡GANADOR ENCONTRADO! 🏆";
-                        
-                        // Nuevo sonido de victoria (Acorde mayor en vez de pitidos)
-                        playWinnerSound();
-                        
-                        dispararMegaConfeti();
-                    }, 200);
-                }
-            }
-            girar();
-        }
-
-        function dispararMegaConfeti() {
-            for (let i = 0; i < 120; i++) {
-                const confetti = document.createElement('div');
-                confetti.style.position = 'fixed';
-                confetti.style.width = '15px'; confetti.style.height = '15px';
-                confetti.style.backgroundColor = ['#EC0000', '#FFF', '#F0B90B', '#28a745'][Math.floor(Math.random() * 4)];
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.top = '-20px';
-                confetti.style.zIndex = '99999';
-                confetti.style.borderRadius = (Math.random() > 0.5) ? '50%' : '3px';
-                confetti.style.transition = 'transform 4s ease-in, top 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-                document.body.appendChild(confetti);
-
-                setTimeout(() => {
-                    confetti.style.top = '120vh';
-                    confetti.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 150 - 75}px)`;
-                }, 50);
-                setTimeout(() => { confetti.remove(); }, 4500);
-            }
-        }
-    </script>
-</body>
-</html>
+                        sort

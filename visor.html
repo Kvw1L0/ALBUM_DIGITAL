@@ -197,17 +197,10 @@
             } catch(e){}
         }
 
-        // ==========================================
-        // 🔥 NUEVO HELPER DE FILTRADO INTELIGENTE 🔥
-        // ==========================================
         function fotoPasaFiltro(foto) {
             if (!configActual.filtro || configActual.filtro === "todos") return true;
-            
-            // Convertimos ambos a minúsculas y quitamos espacios para evitar errores humanos
             const filtroNorm = configActual.filtro.trim().toLowerCase();
             const catNorm = (foto.categoria || "").trim().toLowerCase();
-            
-            // Busca coincidencias parciales (ej: "mi selfie" coincidirá con "1. Mi Selfie")
             return catNorm.includes(filtroNorm) || filtroNorm.includes(catNorm);
         }
 
@@ -241,7 +234,7 @@
         });
 
         // --- LISTENER DE FOTOS ---
-        const qPhotos = query(collection(db, "DDT santander"), orderBy("fecha", "desc"), limit(100));
+        const qPhotos = query(collection(db, "DDT santander"), orderBy("fecha", "desc"), limit(120));
         onSnapshot(qPhotos, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
@@ -254,15 +247,17 @@
             });
         });
 
-        // --- PEAJE INTELIGENTE ---
+        // --- PEAJE INTELIGENTE OPTIMIZADO ---
         setInterval(() => {
             if (colaDeEspera.length > 0 && configActual.sorteoActivo === false && configActual.vista === 'carrusel') {
-                const fotoParaInyectar = colaDeEspera.shift(); 
+                // Buscamos el índice de la primera foto en la cola que cumpla el filtro actual
+                const indexValido = colaDeEspera.findIndex(fotoPasaFiltro);
                 
-                // Aplicamos el filtro inteligente
-                if (!fotoPasaFiltro(fotoParaInyectar)) return;
-                
-                inyectarFotoAlDOM(fotoParaInyectar);
+                if (indexValido !== -1) {
+                    // Extraemos solo ese elemento específico de la cola sin alterar los demás
+                    const fotoParaInyectar = colaDeEspera.splice(indexValido, 1)[0];
+                    inyectarFotoAlDOM(fotoParaInyectar);
+                }
             }
         }, 2000); 
 
@@ -289,7 +284,6 @@
             const mosaicoGrid = document.getElementById('mosaico-view');
             track.innerHTML = ''; mosaicoGrid.innerHTML = ''; fotosEnPantalla = [];
 
-            // Usamos el filtro inteligente para reconstruir la vista
             const fotosFiltradas = baseDeDatosMaster.filter(fotoPasaFiltro);
 
             if (configActual.vista === 'carrusel') {
@@ -306,7 +300,6 @@
 
         // --- MOTOR DE LA RULETA ---
         function iniciarMecanicaSorteo() {
-            // Usamos el filtro inteligente para elegir a los participantes
             const fotosParaSorteo = baseDeDatosMaster.filter(fotoPasaFiltro);
             
             if (fotosParaSorteo.length === 0) {
@@ -341,4 +334,35 @@
                 } else {
                     setTimeout(() => {
                         if (configActual.sorteoActivo === false) return;
-                        sort
+                        sorteoTxt.textContent = "🏆 ¡GANADOR ENCONTRADO! 🏆";
+                        playWinnerSound();
+                        dispararMegaConfeti();
+                    }, 200);
+                }
+            }
+            girar();
+        }
+
+        function dispararMegaConfeti() {
+            for (let i = 0; i < 120; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '15px'; confetti.style.height = '15px';
+                confetti.style.backgroundColor = ['#EC0000', '#FFF', '#F0B90B', '#28a745'][Math.floor(Math.random() * 4)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.zIndex = '99999';
+                confetti.style.borderRadius = (Math.random() > 0.5) ? '50%' : '3px';
+                confetti.style.transition = 'transform 4s ease-in, top 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.style.top = '120vh';
+                    confetti.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 150 - 75}px)`;
+                }, 50);
+                setTimeout(() => { confetti.remove(); }, 4500);
+            }
+        }
+    </script>
+</body>
+</html>

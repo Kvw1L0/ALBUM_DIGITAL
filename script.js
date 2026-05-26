@@ -3,7 +3,7 @@
 // ==========================================
 const laminas = [
   "1. Aquí estoy : mi selfie del evento",
-  "2. Así se vivo mi experiencia",
+  "2. Así se vive mi experiencia",
   "3. Mi momento favorito"
 ];
 

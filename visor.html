@@ -335,4 +335,62 @@
                 return;
             }
 
-            const sorteo
+            const sorteoOverlay = document.getElementById('sorteo-view');
+            const ruletaImg = document.getElementById('ruleta-img');
+            const sorteoTxt = document.getElementById('sorteo-txt');
+            
+            sorteoTxt.textContent = "🎰 SELECCIONANDO GANADOR 🎰";
+            sorteoOverlay.classList.remove('hidden');
+
+            let velocidad = 50; 
+            let vueltas = 0;
+
+            function girar() {
+                if (configActual.sorteoActivo === false) return; 
+
+                const indiceActual = Math.floor(Math.random() * fotosParaSorteo.length);
+                ruletaImg.src = fotosParaSorteo[indiceActual].url_foto;
+                playTick(600 + (vueltas * 5), 0.04); 
+
+                vueltas++;
+
+                if (vueltas < 40) {
+                    setTimeout(girar, velocidad);
+                } else if (vueltas < 55) {
+                    velocidad += 35;
+                    setTimeout(girar, velocidad);
+                } else {
+                    setTimeout(() => {
+                        if (configActual.sorteoActivo === false) return;
+                        sorteoTxt.textContent = "🏆 ¡GANADOR ENCONTRADO! 🏆";
+                        playWinnerSound();
+                        dispararMegaConfeti();
+                    }, 200);
+                }
+            }
+            girar();
+        }
+
+        function dispararMegaConfeti() {
+            for (let i = 0; i < 120; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '15px'; confetti.style.height = '15px';
+                confetti.style.backgroundColor = ['#EC0000', '#FFF', '#F0B90B', '#28a745'][Math.floor(Math.random() * 4)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.zIndex = '99999';
+                confetti.style.borderRadius = (Math.random() > 0.5) ? '50%' : '3px';
+                confetti.style.transition = 'transform 4s ease-in, top 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.style.top = '120vh';
+                    confetti.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 150 - 75}px)`;
+                }, 50);
+                setTimeout(() => { confetti.remove(); }, 4500);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control DDT - Jungle</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .panel-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: #141414;
+            padding: 30px 20px;
+            border-radius: 20px;
+            border: 2px solid #EC0000;
+            box-shadow: 0 0 25px rgba(236, 0, 0, 0.3);
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            text-shadow: 0 0 10px #EC0000;
+        }
+        .section {
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #333;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            color: #aaa;
+        }
+        select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 10px;
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            outline: none;
+            font-weight: bold;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 18px 10px;
+            font-size: 1rem;
+            font-weight: 900;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+        }
+        .btn-mode {
+            background: #222;
+            color: #aaa;
+            border: 1px solid #333;
+        }
+        .btn-mode.active {
+            background: #EC0000;
+            color: white;
+            box-shadow: 0 0 15px #EC0000;
+            border-color: #ff3333;
+        }
+        .btn-sorteo {
+            width: 100%;
+            background: linear-gradient(145deg, #ff3333, #ec0000);
+            color: white;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 20px rgba(236, 0, 0, 0.4);
+            animation: pulse 2s infinite;
+        }
+        .btn:active { transform: scale(0.95); }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(236, 0, 0, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(236, 0, 0, 0.8); }
+            100% { box-shadow: 0 0 10px rgba(236, 0, 0, 0.4); }
+        }
+        #status-hub {
+            font-size: 0.85rem;
+            color: #28a745;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel-container">
+        <h1>Control Backstage</h1>
+        <div id="status-hub">📡 Conectado en vivo con la pantalla principal</div>
+        <br>
+
+        <div class="section">
+            <label>1. Filtrar misiones en pantalla</label>
+            <select id="filtro-select" onchange="actualizarConfig()">
+                <option value="todos">Mostrar Todas las Misiones</option>
+                <option value="1. mi selfie">1. Mi Selfie</option>
+                <option value="2. Foto con mi líder de area">2. Con Líder de Área</option>
+                <option value="3. Mi experiencia DDT">3. Mi Experiencia DDT</option>
+                <option value="4. Foto con cara de ganador 🏆">4. Huevo de Pascua (Ganadores)</option>
+            </select>
+        </div>
+
+        <div class="section">
+            <label>2. Modo de Visualización</label>
+            <div class="btn-group">
+                <button id="btn-carrusel" class="btn btn-mode active" onclick="cambiarVista('carrusel')">🎠 Carrusel Flow</button>
+                <button id="btn-mosaico" class="btn btn-mode" onclick="cambiarVista('mosaico')">📊 Mosaico Masivo</button>
+            </div>
+        </div>
+
+        <div class="section" style="border: none; margin: 0; padding: 0;">
+            <label>3. Gamificación (Cierre de evento)</label>
+            <button class="btn btn-sorteo" onclick="dispararSorteo()">🏆 DISPARAR RULETA GANADORA</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBP5D1AtaIcklOFJiKnEXKilgsz5-363RE",
+            authDomain: "veltis-data1.firebaseapp.com",
+            projectId: "veltis-data1",
+            storageBucket: "veltis-data1.firebasestorage.app",
+            messagingSenderId: "607614671540",
+            appId: "1:607614671540:web:8118954f681910ecf995e1"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Estado local del administrador
+        let estadoActual = {
+            vista: "carrusel",
+            filtro: "todos",
+            triggerSorteo: 0
+        };
+
+        // Sincronizar cambios hacia la base de datos de control
+        async function empujarConfig() {
+            try {
+                await setDoc(doc(db, "DDT_config", "estado"), estadoActual);
+                console.log("Configuración actualizada con éxito.");
+            } catch (e) {
+                console.error("Error de sincronización: ", e);
+            }
+        }
+
+        window.actualizarConfig = function() {
+            estadoActual.filtro = document.getElementById('filtro-select').value;
+            empujarConfig();
+        };
+
+        window.cambiarVista = function(modo) {
+            estadoActual.vista = modo;
+            document.getElementById('btn-carrusel').classList.toggle('active', modo === 'carrusel');
+            document.getElementById('btn-mosaico').classList.toggle('active', modo === 'mosaico');
+            empujarConfig();
+        };
+
+        window.dispararSorteo = function() {
+            if(confirm("¿Estás seguro de iniciar la ruleta ganadora en la pantalla gigante?")) {
+                estadoActual.triggerSorteo = Date.now(); // Sello de tiempo único para forzar activación
+                empujarConfig();
+            }
+        };
+    </script>
+</body>
+</html>

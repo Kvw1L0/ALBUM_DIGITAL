@@ -89,6 +89,14 @@
             letter-spacing: 1px;
             box-shadow: 0 5px 20px rgba(236, 0, 0, 0.4);
             animation: pulse 2s infinite;
+            margin-bottom: 15px;
+        }
+        .btn-cerrar-sorteo {
+            width: 100%;
+            background: #444;
+            color: white;
+            border: 1px solid #666;
+            font-size: 1rem;
         }
         .btn:active { transform: scale(0.95); }
         @keyframes pulse {
@@ -133,6 +141,7 @@
         <div class="section" style="border: none; margin: 0; padding: 0;">
             <label>3. Gamificación (Cierre de evento)</label>
             <button class="btn btn-sorteo" onclick="dispararSorteo()">🏆 DISPARAR RULETA GANADORA</button>
+            <button class="btn btn-cerrar-sorteo" onclick="cerrarSorteo()">🔙 CERRAR SORTEO Y VOLVER AL VISOR</button>
         </div>
     </div>
 
@@ -152,14 +161,14 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Estado local del administrador
+        // Estado local del administrador (agregado sorteoActivo)
         let estadoActual = {
             vista: "carrusel",
             filtro: "todos",
-            triggerSorteo: 0
+            triggerSorteo: 0,
+            sorteoActivo: false
         };
 
-        // Sincronizar cambios hacia la base de datos de control
         async function empujarConfig() {
             try {
                 await setDoc(doc(db, "DDT_config", "estado"), estadoActual);
@@ -183,9 +192,15 @@
 
         window.dispararSorteo = function() {
             if(confirm("¿Estás seguro de iniciar la ruleta ganadora en la pantalla gigante?")) {
-                estadoActual.triggerSorteo = Date.now(); // Sello de tiempo único para forzar activación
+                estadoActual.triggerSorteo = Date.now();
+                estadoActual.sorteoActivo = true;
                 empujarConfig();
             }
+        };
+
+        window.cerrarSorteo = function() {
+            estadoActual.sorteoActivo = false;
+            empujarConfig();
         };
     </script>
 </body>

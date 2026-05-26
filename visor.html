@@ -3,111 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visor DDT Carrusel</title>
+    <title>Visor Oficial DDT</title>
     <style>
         body {
-            /* SE APLICA EL DISEÑO GRÁFICO VISOR.PNG */
             background-color: #000;
             background-image: url('visor.png');
             background-size: cover;
-            background-position: center;
+            background-position: center center;
             background-repeat: no-repeat;
-            
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             height: 100vh;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
         }
-        
-        /* Como ya tienes el diseño en la imagen, ocultamos el título en HTML pero conservamos el espaciado */
-        header {
-            text-align: center;
-            padding: 40px; /* Ajusta esto según dónde empiece el carrusel en tu visor.png */
-            z-index: 10;
-        }
-        
-        h1 { display: none; } /* Oculto, el texto ya viene en visor.png */
 
+        /* --- CONTENEDOR 1: MODO CARRUSEL FLOW --- */
         .carousel-container {
-            flex-grow: 1;
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            top: 180px; /* Margen para respetar tu diseño en visor.png */
             display: flex;
             align-items: center;
             overflow: hidden;
-            position: relative;
         }
-
         .carousel-track {
             display: flex;
-            gap: 60px;
+            gap: 50px;
             padding: 0 50vw; 
-            animation: scroll-carousel 40s linear infinite;
+            will-change: transform;
+            animation: scroll-carrusel 35s linear infinite;
         }
-
-        @keyframes scroll-carousel {
+        @keyframes scroll-carrusel {
             0% { transform: translateX(0); }
             100% { transform: translateX(-100%); }
         }
 
+        /* Diseño de Tarjetas en Carrusel */
         .photo-card {
-            flex: 0 0 400px; 
-            height: 533px; 
+            flex: 0 0 350px; 
+            height: 466px; 
             background: #111;
             border: 5px solid #fff;
             border-radius: 15px;
             position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-            /* Reflejo eliminado por si ensucia tu imagen de fondo, si lo quieres vuelve a agregar -webkit-box-reflect */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
         }
-
         .photo-card img {
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 10px;
         }
 
+        /* --- CONTENEDOR 2: MODO MOSAICO MASIVO (Efecto Amplitud) --- */
+        .mosaic-container {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            top: 180px; 
+            overflow-y: auto;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 15px;
+            box-sizing: border-box;
+        }
+        .mosaic-card {
+            background: #111;
+            border: 2px solid #fff;
+            border-radius: 8px;
+            aspect-ratio: 3/4;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            animation: popInMosaico 0.5s ease-out forwards;
+        }
+        .mosaic-card img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        @keyframes popInMosaico {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Etiquetas comunes de categoría */
         .category-tag {
             position: absolute;
-            bottom: -20px;
-            left: 50%;
+            bottom: -15px; left: 50%;
             transform: translateX(-50%);
             background: #EC0000;
             color: white;
-            padding: 10px 25px;
-            border-radius: 30px;
-            font-size: 1.2rem;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
             font-weight: 900;
             text-transform: uppercase;
-            box-shadow: 0 5px 15px rgba(236,0,0,0.6);
+            box-shadow: 0 4px 10px rgba(236,0,0,0.6);
             white-space: nowrap;
             z-index: 10;
         }
 
-        .photo-card.new-entry {
-            animation: pop-in 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        /* --- CONTENEDOR 3: LA RULETA GANADORA (SORTEO) --- */
+        .sorteo-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .ruleta-box {
+            width: 450px;
+            height: 600px;
+            border: 8px solid #EC0000;
+            border-radius: 20px;
+            box-shadow: 0 0 50px #EC0000;
+            background: #111;
+            overflow: hidden;
+            position: relative;
+        }
+        .ruleta-box img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        .sorteo-title {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-shadow: 0 0 20px #EC0000;
+            margin-bottom: 30px;
         }
 
-        @keyframes pop-in {
-            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
-        }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <header><h1>Visor</h1></header>
+    <div id="carrusel-view" class="carousel-container">
+        <div id="carousel-track" class="carousel-track"></div>
+    </div>
 
-    <div class="carousel-container">
-        <div id="carousel-track" class="carousel-track">
-            </div>
+    <div id="mosaico-view" class="mosaic-container hidden"></div>
+
+    <div id="sorteo-view" class="sorteo-overlay hidden">
+        <div class="sorteo-title" id="sorteo-txt">🎰 SELECCIONANDO GANADOR 🎰</div>
+        <div class="ruleta-box">
+            <img id="ruleta-img" src="" alt="Sorteo">
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, limit, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBP5D1AtaIcklOFJiKnEXKilgsz5-363RE",
@@ -120,31 +167,207 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+
+        // --- MOTORES DE DATOS ---
+        let baseDeDatosMaster = []; // Cerebro: Almacena hasta las 800+ fotos para el sorteo
+        let colaDeEspera = [];      // Buffer: Cola de solicitudes controlada (Peaje)
+        let fotosEnPantalla = [];   // DOM: Máximo 30 fotos renderizadas para proteger la RAM
         
-        const track = document.getElementById('carousel-track');
-        let displayedIds = new Set();
+        let configActual = { vista: "carrusel", filtro: "todos", lastSorteoTimestamp: 0 };
 
-        const q = query(collection(db, "DDT santander"), orderBy("fecha", "desc"), limit(20));
+        // Audio sintetizado nativo para la ruleta
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playTick(freq = 600, duration = 0.05) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+                osc.start(); osc.stop(audioCtx.currentTime + duration);
+            } catch(e){}
+        }
 
-        onSnapshot(q, (snapshot) => {
+        // ==========================================
+        // ESPECTADOR 1: Escucha la Configuración (Admin)
+        // ==========================================
+        onSnapshot(doc(db, "DDT_config", "estado"), (snapshot) => {
+            if (!snapshot.exists()) return;
+            const data = snapshot.data();
+            
+            // A. Cambiar Filtros en Vivo
+            if(data.filtro !== configActual.filtro) {
+                configActual.filtro = data.filtro;
+                ejecutarFiltroRemoto();
+            }
+
+            // B. Alternar entre Carrusel y Mosaico
+            if(data.vista !== configActual.vista) {
+                configActual.vista = data.vista;
+                document.getElementById('carrusel-view').classList.toggle('hidden', data.vista !== 'carrusel');
+                document.getElementById('mosaico-view').classList.toggle('hidden', data.vista !== 'mosaico');
+                ejecutarFiltroRemoto();
+            }
+
+            // C. Lanzar el Sorteo de la Ruleta Ganadora
+            if(data.triggerSorteo && data.triggerSorteo !== configActual.lastSorteoTimestamp) {
+                configActual.lastSorteoTimestamp = data.triggerSorteo;
+                iniciarMecanicaSorteo();
+            }
+        });
+
+        // ==========================================
+        // ESPECTADOR 2: Escucha y alimenta el Buffer de fotos
+        // ==========================================
+        const qPhotos = query(collection(db, "DDT santander"), orderBy("fecha", "desc"), limit(100));
+        onSnapshot(qPhotos, (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 if (change.type === "added") {
                     const foto = change.doc.data();
-                    const docId = change.doc.id;
-
-                    if (!displayedIds.has(docId)) {
-                        displayedIds.add(docId);
-                        const div = document.createElement('div');
-                        div.className = 'photo-card new-entry';
-                        div.innerHTML = `
-                            <img src="${foto.url_foto}" alt="Experiencia DDT" loading="lazy">
-                            <div class="category-tag">${foto.categoria}</div>
-                        `;
-                        track.insertBefore(div, track.firstChild);
+                    
+                    // Evitar duplicados por ID de Firestore
+                    if (!baseDeDatosMaster.some(f => f.url_foto === foto.url_foto)) {
+                        baseDeDatosMaster.push(foto); // Almacenamiento RAM masivo a prueba de fallos
+                        colaDeEspera.push(foto);     // Entra al buffer invisible de espera
                     }
                 }
             });
         });
+
+        // ==========================================
+        // "PEAJE INTELIGENTE": Despacha el Buffer cada 2 segundos
+        // ==========================================
+        setInterval(() => {
+            // Solo procesa si hay fotos en cola, si no estamos en sorteo y si el modo carrusel está activo
+            if (colaDeEspera.length > 0 && document.getElementById('sorteo-view').classList.contains('hidden') && configActual.vista === 'carrusel') {
+                const fotoParaInyectar = colaDeEspera.shift(); // Saca la primera de la fila
+                
+                // Aplicar filtro si corresponde
+                if (configActual.filtro !== "todos" && fotoParaInyectar.categoria !== configActual.filtro) return;
+
+                inyectarFotoAlDOM(fotoParaInyectar);
+            }
+        }, 2000); 
+
+        function inyectarFotoAlDOM(foto) {
+            const track = document.getElementById('carousel-track');
+            
+            const div = document.createElement('div');
+            div.className = 'photo-card new-entry';
+            div.innerHTML = `
+                <img src="${foto.url_foto}" alt="DDT">
+                <div class="category-tag">${foto.categoria}</div>
+            `;
+            
+            track.insertBefore(div, track.firstChild);
+            fotosEnPantalla.push(div);
+
+            // OPTIMIZACIÓN CRÍTICA DEL DOM: Si hay más de 25 fotos en pantalla, destruimos la más vieja
+            if (fotosEnPantalla.length > 25) {
+                const fotoVieja = fotosEnPantalla.shift();
+                fotoVieja.remove();
+            }
+        }
+
+        // Re-renderizar si el Admin cambia el filtro o el tipo de vista
+        function ejecutarFiltroRemoto() {
+            const track = document.getElementById('carousel-track');
+            const mosaicoGrid = document.getElementById('mosaico-view');
+            
+            track.innerHTML = '';
+            mosaicoGrid.innerHTML = '';
+            fotosEnPantalla = [];
+
+            // Filtrar la base de datos maestra
+            const fotosFiltradas = baseDeDatosMaster.filter(f => configActual.filtro === "todos" || f.categoria === configActual.filtro);
+
+            if (configActual.vista === 'carrusel') {
+                // Al cambiar filtro en carrusel, cargamos solo las últimas 15 instantáneamente
+                fotosFiltradas.slice(0, 15).reverse().forEach(f => inyectarFotoAlDOM(f));
+            } else {
+                // Modo Mosaico Masivo: Inyecta hasta 80 fotos pequeñas de golpe sin romper rendimiento
+                fotosFiltradas.slice(0, 80).forEach(f => {
+                    const cell = document.createElement('div');
+                    cell.className = 'mosaic-card';
+                    cell.innerHTML = `<img src="${f.url_foto}" loading="lazy">`;
+                    mosaicoGrid.appendChild(cell);
+                });
+            }
+        }
+
+        // ==========================================
+        // MOTOR DE LA RULETA GANADORA (EL SORTEO)
+        // ==========================================
+        function iniciarMecanicaSorteo() {
+            const fotosParaSorteo = baseDeDatosMaster.filter(f => configActual.filtro === "todos" || f.categoria === configActual.filtro);
+            
+            if (fotosParaSorteo.length === 0) {
+                alert("No hay fotos registradas bajo el filtro actual para realizar el sorteo.");
+                return;
+            }
+
+            const sorteoOverlay = document.getElementById('sorteo-view');
+            const ruletaImg = document.getElementById('ruleta-img');
+            const sorteoTxt = document.getElementById('sorteo-txt');
+            
+            sorteoTxt.textContent = "🎰 SELECCIONANDO GANADOR 🎰";
+            sorteoOverlay.classList.remove('hidden');
+
+            let velocidad = 50; // ms por cambio de imagen (velocidad inicial de vértigo)
+            let vueltas = 0;
+            let indiceActual = 0;
+
+            function girar() {
+                indiceActual = Math.floor(Math.random() * fotosParaSorteo.length);
+                ruletaImg.src = fotosParaSorteo[indiceActual].url_foto;
+                playTick(600 + (vueltas * 5), 0.04); // Sube el tono del tic para aumentar tensión
+
+                vueltas++;
+
+                if (vueltas < 40) {
+                    // Velocidad crucero alta
+                    setTimeout(girar, velocidad);
+                } else if (vueltas < 55) {
+                    // Empieza el frenado paulatino (Efecto físico de inercia)
+                    velocidad += 35;
+                    setTimeout(girar, velocidad);
+                } else {
+                    // Cierre del Sorteo: Tenemos Ganador Real
+                    setTimeout(() => {
+                        sorteoTxt.textContent = "🏆 ¡GANADOR ENCONTRADO! 🏆";
+                        playTick(880, 0.3);
+                        setTimeout(() => { playTick(1200, 0.4); }, 1500);
+                        
+                        // Lluvia masiva de confeti en pantalla gigante
+                        dispararMegaConfeti();
+                    }, 200);
+                }
+            }
+
+            girar();
+        }
+
+        function dispararMegaConfeti() {
+            for (let i = 0; i < 120; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '15px'; confetti.style.height = '15px';
+                confetti.style.backgroundColor = ['#EC0000', '#FFF', '#F0B90B', '#28a745'][Math.floor(Math.random() * 4)];
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = '-20px';
+                confetti.style.zIndex = '99999';
+                confetti.style.borderRadius = (Math.random() > 0.5) ? '50%' : '3px';
+                confetti.style.transition = 'transform 4s ease-in, top 4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                document.body.appendChild(confetti);
+
+                setTimeout(() => {
+                    confetti.style.top = '120vh';
+                    confetti.style.transform = `rotate(${Math.random() * 1000}deg) translateX(${Math.random() * 150 - 75}px)`;
+                }, 50);
+                setTimeout(() => { confetti.remove(); }, 4500);
+            }
+        }
     </script>
 </body>
 </html>

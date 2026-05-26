@@ -197,11 +197,26 @@
             } catch(e){}
         }
 
+        // ==========================================
+        // 🔥 FILTRO INTELIGENTE (A PRUEBA DE BALAS) 🔥
+        // ==========================================
         function fotoPasaFiltro(foto) {
             if (!configActual.filtro || configActual.filtro === "todos") return true;
-            const filtroNorm = configActual.filtro.trim().toLowerCase();
-            const catNorm = (foto.categoria || "").trim().toLowerCase();
-            return catNorm.includes(filtroNorm) || filtroNorm.includes(catNorm);
+            
+            const filtroTexto = configActual.filtro.trim();
+            const categoriaFoto = (foto.categoria || "").trim();
+            
+            // TRUCO INFALIBLE: Comparamos solo el primer número (1, 2, 3 o 4)
+            const numeroFiltro = filtroTexto.charAt(0);
+            const numeroCategoria = categoriaFoto.charAt(0);
+            
+            if (numeroFiltro >= '1' && numeroFiltro <= '4' && numeroFiltro === numeroCategoria) {
+                return true;
+            }
+            
+            // Respaldo secundario por texto
+            return categoriaFoto.toLowerCase().includes(filtroTexto.toLowerCase());
+        }
         }
 
         // --- LISTENER DEL ADMIN ---

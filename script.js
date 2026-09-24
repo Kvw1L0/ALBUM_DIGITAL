@@ -2,9 +2,11 @@
 // 1. CONSTANTES Y ESTADO GLOBAL
 // ==========================================
 const laminas = [
-  "1. POSE DE ROCK STAR",
-  "2. FOTO CON MI BANDA",
-  "3. FOTO PORTADA DE ALBUM"
+  "1. POSES DE ROCK STAR",
+  "2. FOTO POSE SUPER HEROES (TIPO AVENGERS)",
+  "3. SELFIE CON EL ANIMADDOR"
+  "4. FOTO IMITANDO UN EMOJI"
+  "5. FOTO PUBLICITARIA : Elijan cualquier objeto que encuentren y hagan una foto como si estuvieran protagonizando una campaña publicitaria de lujo."
 ];
 
 let currentLamina = null;

@@ -11,7 +11,7 @@ const laminas = [
   "7. PELUCAS TRAS EL ARBOL",
   "8. NOMBRE DEL EQUIPO",
   "9. FOTO DIECIOCHERA",
-  "10. DEL BAJO AL MÁS ALTO",
+  "10. DEL MÁS BAJO AL MÁS ALTO",
 ];
 
 let currentLamina = null;

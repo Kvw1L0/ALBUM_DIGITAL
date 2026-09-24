@@ -4,8 +4,8 @@
 const laminas = [
   "1. POSES DE ROCK STAR",
   "2. FOTO POSE SUPER HEROES (TIPO AVENGERS)",
-  "3. SELFIE CON EL ANIMADDOR"
-  "4. FOTO IMITANDO UN EMOJI"
+  "3. SELFIE CON EL ANIMADDOR",
+  "4. FOTO IMITANDO UN EMOJI",
   "5. FOTO PUBLICITARIA : Elijan cualquier objeto que encuentren y hagan una foto como si estuvieran protagonizando una campaña publicitaria de lujo."
 ];
 

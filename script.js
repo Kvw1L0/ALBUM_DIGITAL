@@ -2,11 +2,16 @@
 // 1. CONSTANTES Y ESTADO GLOBAL
 // ==========================================
 const laminas = [
-  "1. POSE FARMEANDO AURA",
-  "2. FOTO POSE SUPER HEROES (TIPO AVENGERS)",
-  "3. SELFIE CON EL ANIMADDOR",
-  "4. FOTO IMITANDO UN EMOJI",
-  "5. FOTO PUBLICITARIA : Elijan cualquier objeto que encuentren y hagan una foto como si estuvieran protagonizando una campaña publicitaria de lujo."
+  "1. EQUIPO ENMASCARADO",
+  "2.  V DE VELTIS",
+  "3. FOTO OFICIAL",
+  "4. SALTO DE FELICIDAD",
+  "5. EL CHACAL DE LA TROMPETA"
+  "6. LLEGADA A LA LUNA"
+  "7. PELUCAS TRAS EL ARBOL"
+  "8. NOMBRE DEL EQUIPO
+  "9. FOTO DIECIOCHERA"
+  "10. DEL BAJO AL MÁS ALTO""
 ];
 
 let currentLamina = null;
@@ -132,7 +137,7 @@ function triggerGlitch() {
         setTimeout(() => {
             playSound('success');
             vibrate([300, 300, 500]);
-            crearLaminaIndividual("6. montando a caballo con un compañero");
+            crearLaminaIndividual("11. SELFIE CON EL ANIMADOR");
             
             const containerScroll = document.querySelector('.container');
             if(containerScroll) containerScroll.scrollTop = containerScroll.scrollHeight;

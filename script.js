@@ -2,7 +2,7 @@
 // 1. CONSTANTES Y ESTADO GLOBAL
 // ==========================================
 const laminas = [
-  "1. POSES DE ROCK STAR",
+  "1. POSE FARMEANDO AURA",
   "2. FOTO POSE SUPER HEROES (TIPO AVENGERS)",
   "3. SELFIE CON EL ANIMADDOR",
   "4. FOTO IMITANDO UN EMOJI",
@@ -131,8 +131,8 @@ function triggerGlitch() {
         secretUnlocked = true;
         setTimeout(() => {
             playSound('success');
-            vibrate([100, 100, 200]);
-            crearLaminaIndividual("4. Foto con cara de ganador 🏆");
+            vibrate([300, 300, 500]);
+            crearLaminaIndividual("6. montando a caballo con un compañero");
             
             const containerScroll = document.querySelector('.container');
             if(containerScroll) containerScroll.scrollTop = containerScroll.scrollHeight;
